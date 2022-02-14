@@ -1,0 +1,45 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+% \setmainfont{新細明體}
+\setCJKmainfont{新細明體}
+
+\XeTeXlinebreaklocale "zh"
+
+\title{輸入標題}
+\author{李緒成}
+
+\begin{document}
+
+    \begin{itemize}
+        \item 給你一個數列$a_i$,有兩種操作:區間求和;
+        $$\sum_{i=l}^{r}(a[i]+=fib[i-l+1])$$\(fib\)是斐波那契數列。
+        思路
+        \(fib[n] = \frac{\sqrt5}{5}\times [(\frac{1+\sqrt5}{2})^n-(\frac{1-\sqrt5}{2})^n]\)
+        
+        \item 有關取模、同余、逆元的一些東西:\(p = 1e9 + 9\)
+        \item \(383008016^2 \equiv 5 (mod\;p)\)
+        \item \(383008016 \equiv \sqrt5 (mod\;p)\)
+        \item \(\frac{1}{\sqrt5} \equiv 276601605(mod\;p)\)
+        \item \(383008016^{-1} \equiv 276601605(mod\;p)\)
+        \item \((1+\sqrt5)/2 \equiv 691504013(mod\;p)\)
+        \item \(383008017\times 2^{-1} \equiv 691504013(mod\;p)\)
+        \item \((1-\sqrt5)/2 \equiv 308495997(mod\;p)\)
+        \item \((p-383008016+1)\times 2^{-1} \equiv 308495997(mod\;p)\)
+        
+        \item \(fib[n] = 276601605\times [(691504013)^n-(308495997)^n] (mod\;\;p)\)
+        \item \(sum = \frac{a}{a-1} \times (a^n - 1) (mod\;\;p) = a^2(a^n-1)(mod\;\;p)=a^{n+2}-a^2(mod\;\;p)\)
+        \item 當\(p=1e9+9, a = \{691504013, 308495997\}\)。
+        \item 所以本題我們只需要用線段樹lazy標記維護兩個等比數列第一項為一次項的系數即可
+    \end{itemize}
+
+
+\end{document} 
