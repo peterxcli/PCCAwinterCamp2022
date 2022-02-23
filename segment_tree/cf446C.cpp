@@ -1,107 +1,117 @@
-// https://codeforces.com/contest/446/problem/C
 #include <bits/stdc++.h>
-
+#define lson rt << 1
+#define rson rt << 1 | 1
 using namespace std;
-
 #define int long long
-#define MAXN 300010
 
+const int MXN = 5e5 + 6;
+const int INF = 0x3f3f3f3f;
 const int mod = 1000000009;
+const int p1 = 691504013;
+const int p2 = 308495997;
+const int p3 = 276601605;
 
-int base1, base2, inv, n, m;
-int seq[MAXN];
-int quick_pow(int a, int b) {
-    int ret = 1;
-    for (;b; b>>1, a = a * a % mod) {
-        if (b & 1) ret = ret * a % mod;
+int n, m;
+int ar[MXN], pre[MXN], mul1[MXN], mul2[MXN];
+int sum[MXN << 2], lazy1[MXN << 2], lazy2[MXN << 2];
+int ksm(int a, int b) {
+    int res = 1;
+    for (; b; b >>= 1, a = a * a % mod) {
+        if (b & 1) res = res * a % mod;
     }
-    return ret;
+    return res;
 }
-struct Segment_Tree {
-#define mid (l + r >> 1)
-#define ls x << 1, l, mid
-#define rs x << 1 | 1, mid + 1, r
-    int p[MAXN], tree[MAXN << 2], lazy[MAXN << 2], q, Inv;
-    void init() {
-        p[0] = 1;
-        for (int i = 1; i <= n; ++i)
-            p[i] = p[i - 1] * q % mod;
-        Inv = quick_pow(q - 1, mod - 2);
-        build(1, 1, n);
+void check(int &a) {
+    if (a >= mod) a %= mod;
+}
+void push_up(int rt) {
+    sum[rt] = sum[lson] + sum[rson];
+    check(sum[rt]);
+}
+void push_down(int l, int r, int rt) {
+    if (lazy1[rt] == 0 && lazy2[rt] == 0) return;
+    int a = lazy1[rt], b = lazy2[rt];
+    int mid = (l + r) >> 1;
+    int len1 = mid - l + 1, len2 = r - mid;
+    lazy1[lson] += a;
+    lazy2[lson] += b;
+    sum[lson] = sum[lson] + a * ((mul1[len1 + 2] - mul1[2]) % mod + mod);
+    check(sum[lson]);
+    sum[lson] = (sum[lson] - b * ((mul2[len1 + 2] - mul2[2]) % mod + mod)) % mod + mod;
+    check(sum[lson]);
+    lazy1[rson] += a * mul1[len1] % mod;
+    lazy2[rson] += b * mul2[len1] % mod;
+    sum[rson] = sum[rson] + a * mul1[len1] % mod * ((mul1[len2 + 2] - mul1[2]) % mod + mod);
+    check(sum[rson]);
+    sum[rson] = (sum[rson] - b * mul2[len1] % mod * ((mul2[len2 + 2] - mul2[2]) % mod + mod)) % mod + mod;
+    check(sum[rson]);
+    lazy1[rt] = lazy2[rt] = 0;
+    check(lazy1[lson]);
+    check(lazy1[rson]);
+    check(lazy2[lson]);
+    check(lazy2[rson]);
+}
+void update(int L, int R, int l, int r, int rt, int x, int y) {
+    if (L <= l && r <= R) {
+        lazy1[rt] += x;
+        lazy2[rt] += y;
+        check(lazy1[rt]);
+        check(lazy2[rt]);
+        sum[rt] = sum[rt] + x * ((mul1[r - l + 3] - mul1[2]) % mod + mod);
+        check(sum[rt]);
+        sum[rt] = (sum[rt] - y * ((mul2[r - l + 3] - mul2[2]) % mod + mod)) % mod + mod;
+        check(sum[rt]);
         return;
     }
-    void push_up(int x) {
-        tree[x] = (tree[x << 1] + tree[x << 1 | 1]) % mod;
+    push_down(l, r, rt);
+    int mid = (l + r) >> 1;
+    if (L > mid)
+        update(L, R, mid + 1, r, rson, x, y);
+    else if (R <= mid)
+        update(L, R, l, mid, lson, x, y);
+    else {
+        update(L, mid, l, mid, lson, x, y);
+        update(mid + 1, R, mid + 1, r, rson, mul1[mid - L + 1] * x % mod, mul2[mid - L + 1] * y % mod);
     }
-    void build(int x, int l, int r) {
-        if (l == r)
-            return;
-        build(ls);
-        build(rs);
-        push_up(x);
-        return;
+    push_up(rt);
+}
+int query(int L, int R, int l, int r, int rt) {
+    if (L <= l && r <= R) {
+        return sum[rt];
     }
-    void add(int x, int l, int r, int a) {
-        lazy[x] += a;
-        tree[x] += (a * p[r - l + 1] % mod - a + mod) % mod * Inv % mod;
-        return;
+    push_down(l, r, rt);
+    int mid = (l + r) >> 1;
+    if (L > mid)
+        return query(L, R, mid + 1, r, rson);
+    else if (R <= mid)
+        return query(L, R, l, mid, lson);
+    else {
+        int ans = query(L, mid, l, mid, lson);
+        ans += query(mid + 1, R, mid + 1, r, rson);
+        check(ans);
+        return ans;
     }
-    void push_down(int x, int l, int r) {
-        if (!lazy[x]) return;
-        add(ls, lazy[x]);
-        add(rs, lazy[x] * p[r - l + 1] % mod);
-        lazy[x] = 0;
-    }
-    void modify(int x, int l, int r, int L, int R, int a) {
-        if (l == L && r == R) {
-            add(x, l, r, a);
-            return;
-        }
-        push_down(x, l, r);
-        if (r <= mid) modify(ls, L, R, a);
-        else if (l > mid) modify(rs, L, R, a);
-        else {
-            modify(ls, L, mid, a);
-            modify(rs, mid + 1, R, a * p[mid - L + 1] % mod);
-        }
-        push_up(x);
-        return;
-    }
-    int query(int x, int l, int r, int L, int R) {
-        if (l == L && r == R) return tree[x];
-        push_down(x, l, r);
-        if (r <= mid) return query(ls, L, R);
-        else if (l > mid) return query(rs, L, R);
-        else return (query(ls, L, mid) + query(rs, mid + 1, R)) % mod;
-    }
-
-}t1, t2;
-
+}
 int32_t main() {
     cin.tie(0), cout.tie(0), ios_base::sync_with_stdio(0);
-    t1.q = (383008016 + 1) * quick_pow(2ll, mod - 2) % mod;
-    t2.q = (1 - 383008016 + mod) * quick_pow(2ll, mod - 2) % mod;
-    inv = quick_pow(383008016, mod - 2);
-
     cin >> n >> m;
-    for (int i = 1; i <= n; ++i) {
-        int x;
-        cin >> x;
-        seq[i] = (seq[i - 1] + x) % mod;
+    mul1[0] = mul2[0] = 1;
+    for (int i = 1; i < 301000; ++i) {
+        mul1[i] = mul1[i - 1] * p1;
+        mul2[i] = mul2[i - 1] * p2;
+        check(mul1[i]);
+        check(mul2[i]);
     }
-    t1.init(), t2.init();
+    for (int i = 1; i <= n; ++i)
+        cin >> ar[i], pre[i] = (pre[i - 1] + ar[i]) % mod;
     while (m--) {
-        int op, l, r;
-        cin >> op >> l >> r;
-        if (op == 1) {
-            t1.modify(1, 1, n, l, r, t1.q);
-            t2.modify(1, 1, n, l, r, t2.q);
-        } 
-        else {
-            int a = t1.query(1, 1, n, l, r);
-            int b = t2.query(1, 1, n, l, r);
-            int ans = (a - b + mod) % mod * inv % mod;
-            cout << ((seq[r] - seq[l - 1] + mod) % mod + ans) % mod << "\n";
+        int opt, l, r;
+        cin >> opt >> l >> r;
+        if (opt == 1) {
+            update(l, r, 1, n, 1, 1, 1);
+        } else {
+            cout << ((p3 * query(l, r, 1, n, 1) % mod + pre[r] - pre[l - 1]) % mod + mod) % mod << "\n";
         }
     }
+    return 0;
 }
