@@ -36,7 +36,7 @@
         \item \((p-383008016+1)\times 2^{-1} \equiv 308495997(mod\;p)\)
         
         \item \(fib[n] = 276601605\times [(691504013)^n-(308495997)^n] (mod\;\;p)\)
-        \item \(sum = \frac{a}{a-1} \times (a^n - 1) (mod\;\;p) = a^2(a^n-1)(mod\;\;p)=a^{n+2}-a^2(mod\;\;p)\)
+        \item \(sum = \frac{a}{a-1} \times (a^n - 1) (mod\;\;p) \equiv a^2(a^n-1)(mod\;\;p)\equiv a^{n+2}-a^2(mod\;\;p)\)
         \item 當\(p=1e9+9, a = \{691504013, 308495997\}\)。
         \item 所以本題我們只需要用線段樹lazy標記維護兩個等比數列第一項為一次項的系數即可
     \end{itemize}
