@@ -87,8 +87,8 @@ title : 題單
 ### linear algebra
 
 * [x] https://toj.tfcis.org/oj/pro/174/
-* [ ] https://toj.tfcis.org/oj/pro/466/
-* [ ] https://zerojudge.tw/ShowProblem?problemid=a542
+* [x] https://toj.tfcis.org/oj/pro/466/
+* [x] https://zerojudge.tw/ShowProblem?problemid=a542
 * [ ] https://tioj.ck.tp.edu.tw/problems/2170
 
 ### 模擬賽
