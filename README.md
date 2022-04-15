@@ -89,7 +89,7 @@ title : 題單
 * [x] https://toj.tfcis.org/oj/pro/174/
 * [x] https://toj.tfcis.org/oj/pro/466/
 * [x] https://zerojudge.tw/ShowProblem?problemid=a542
-* [ ] https://tioj.ck.tp.edu.tw/problems/2170
+* [x] https://tioj.ck.tp.edu.tw/problems/2170
 
 ### 模擬賽
 
